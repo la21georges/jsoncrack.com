@@ -43,16 +43,38 @@ const Node = ({ node, x, y }: CustomNodeProps) => (
     y={0}
     $isObject
   >
-    {node.text.map((row, index) => (
-      <Row key={`${node.id}-${index}`} row={row} x={x} y={y} index={index} />
-    ))}
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {(() => {
+        const firstRow = node.text?.[0];
+        const firstPrimitiveValue = typeof firstRow?.value === "string" || typeof firstRow?.value === "number" ? String(firstRow?.value) : undefined;
+        const shouldShowLabel = Boolean(node.name && node.name !== firstPrimitiveValue);
+        return shouldShowLabel ? (
+          <div style={{ position: "absolute", top: 2, left: 6, fontSize: 10, fontWeight: 700, pointerEvents: "none" }}>
+            {node.name}
+          </div>
+        ) : null;
+      })()}
+
+      <div style={{ paddingTop: (() => {
+        const firstRow = node.text?.[0];
+        const firstPrimitiveValue = typeof firstRow?.value === "string" || typeof firstRow?.value === "number" ? String(firstRow?.value) : undefined;
+        const shouldShowLabel = Boolean(node.name && node.name !== firstPrimitiveValue);
+        return shouldShowLabel ? 16 : 0;
+      })() }}>
+        {node.text.map((row, index) => (
+          <Row key={`${node.id}-${index}`} row={row} x={x} y={y} index={index} />
+        ))}
+      </div>
+    </div>
   </Styled.StyledForeignObject>
 );
 
 function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
   return (
     JSON.stringify(prev.node.text) === JSON.stringify(next.node.text) &&
-    prev.node.width === next.node.width
+    prev.node.width === next.node.width &&
+    prev.node.name === next.node.name &&
+    prev.node.color === next.node.color
   );
 }
 

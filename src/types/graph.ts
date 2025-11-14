@@ -14,6 +14,11 @@ export interface NodeData {
   width: number;
   height: number;
   path?: JSONPath;
+  // optional metadata populated by parser or UI
+  parentKey?: string;
+  parentType?: string;
+  name?: string;
+  color?: string;
 }
 
 export interface EdgeData {

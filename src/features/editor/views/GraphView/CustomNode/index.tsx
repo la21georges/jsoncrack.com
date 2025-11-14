@@ -22,8 +22,9 @@ const CustomNodeWrapper = (nodeProps: NodeProps<NodeData>) => {
 
   const handleNodeClick = React.useCallback(
     (_: React.MouseEvent<SVGGElement, MouseEvent>, data: NodeData) => {
-      if (setSelectedNode) setSelectedNode(data);
+      // show modal first for perceived responsiveness, then set selected node data
       setVisible("NodeModal", true);
+      if (setSelectedNode) setSelectedNode(data);
     },
     [setSelectedNode, setVisible]
   );
@@ -41,9 +42,10 @@ const CustomNodeWrapper = (nodeProps: NodeProps<NodeData>) => {
         ev.currentTarget.style.stroke = colorScheme === "dark" ? "#424242" : "#BCBEC0";
       }}
       style={{
-        fill: colorScheme === "dark" ? "#292929" : "#ffffff",
-        stroke: colorScheme === "dark" ? "#424242" : "#BCBEC0",
+        fill: (nodeProps.properties as NodeData).color ?? (colorScheme === "dark" ? "#292929" : "#ffffff"),
+        stroke: (nodeProps.properties as NodeData).color ?? (colorScheme === "dark" ? "#424242" : "#BCBEC0"),
         strokeWidth: 1,
+        pointerEvents: "auto",
       }}
     >
       {({ node, x, y }) => {

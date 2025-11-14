@@ -32,6 +32,9 @@ const Node = ({ node, x, y }: CustomNodeProps) => {
   const isImage = imagePreviewEnabled && isContentImage(JSON.stringify(text[0].value));
   const value = text[0].value;
 
+  const firstPrimitiveValue = typeof text[0]?.value === "string" || typeof text[0]?.value === "number" ? String(text[0]?.value) : undefined;
+  const shouldShowLabel = Boolean(node.name && node.name !== firstPrimitiveValue);
+
   return (
     <Styled.StyledForeignObject
       data-id={`node-${node.id}`}
@@ -40,28 +43,42 @@ const Node = ({ node, x, y }: CustomNodeProps) => {
       x={0}
       y={0}
     >
-      {isImage ? (
-        <StyledImageWrapper>
-          <StyledImage src={JSON.stringify(text[0].value)} width="70" height="70" loading="lazy" />
-        </StyledImageWrapper>
-      ) : (
-        <StyledTextNodeWrapper
-          data-x={x}
-          data-y={y}
-          data-key={JSON.stringify(text)}
-          $isParent={false}
-        >
-          <Styled.StyledKey $value={value} $type={typeof text[0].value}>
-            <TextRenderer>{value}</TextRenderer>
-          </Styled.StyledKey>
-        </StyledTextNodeWrapper>
-      )}
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        {shouldShowLabel ? (
+          <div style={{ position: "absolute", top: 2, left: 6, fontSize: 10, fontWeight: 700, pointerEvents: "none" }}>
+            {node.name}
+          </div>
+        ) : null}
+
+        {isImage ? (
+          <StyledImageWrapper style={{ paddingTop: shouldShowLabel ? 16 : 0 }}>
+            <StyledImage src={JSON.stringify(text[0].value)} width="70" height="70" loading="lazy" />
+          </StyledImageWrapper>
+        ) : (
+          <StyledTextNodeWrapper
+            data-x={x}
+            data-y={y}
+            data-key={JSON.stringify(text)}
+            $isParent={false}
+            style={{ paddingTop: shouldShowLabel ? 16 : 0 }}
+          >
+            <Styled.StyledKey $value={value} $type={typeof text[0].value}>
+              <TextRenderer>{value}</TextRenderer>
+            </Styled.StyledKey>
+          </StyledTextNodeWrapper>
+        )}
+      </div>
     </Styled.StyledForeignObject>
   );
 };
 
 function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
-  return prev.node.text === next.node.text && prev.node.width === next.node.width;
+  return (
+    prev.node.text === next.node.text &&
+    prev.node.width === next.node.width &&
+    prev.node.name === next.node.name &&
+    prev.node.color === next.node.color
+  );
 }
 
 export const TextNode = React.memo(Node, propsAreEqual);
